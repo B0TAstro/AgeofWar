@@ -5,11 +5,12 @@ using UnityEngine;
 public class StoneProjectile : MonoBehaviour
 {
     public float speed = 10f;
-    public int damage;
+    private int damage;
+    private bool isPlayerOne;
 
     private void Update()
     {
-        transform.Translate(Vector2.right * speed * Time.deltaTime);
+        transform.Translate(isPlayerOne ? Vector2.right : Vector2.left * speed * Time.deltaTime);
     }
 
     public void SetDamage(int damageAmount)
@@ -19,7 +20,7 @@ public class StoneProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if ((isPlayerOne && collision.CompareTag("Enemy")) || (!isPlayerOne && collision.CompareTag("PlayerOneUnit")))
         {
             collision.GetComponent<Unit>().TakeDamage(damage);
             Destroy(gameObject);

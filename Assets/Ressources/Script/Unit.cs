@@ -10,14 +10,12 @@ public class Unit : MonoBehaviour
     public float moveSpeed;
     public bool isPlayerOne;
 
-    private Transform target;
-
     private void Update()
     {
         Move();
     }
 
-    private void Move()
+    protected void Move()
     {
         if (isPlayerOne)
         {
@@ -27,16 +25,11 @@ public class Unit : MonoBehaviour
         {
             transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
         }
-
-        if (target != null)
-        {
-            // Attack logic
-        }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damageAmount)
     {
-        health -= damage;
+        health -= damageAmount;
         if (health <= 0)
         {
             Die();
@@ -46,14 +39,5 @@ public class Unit : MonoBehaviour
     private void Die()
     {
         Destroy(gameObject);
-        // Add logic to reward gold and experience to the attacker
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if ((isPlayerOne && collision.CompareTag("Enemy")) || (!isPlayerOne && collision.CompareTag("PlayerOneUnit")))
-        {
-            target = collision.transform;
-        }
     }
 }

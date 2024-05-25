@@ -13,13 +13,13 @@ public class Spawner : MonoBehaviour
         GameObject unitPrefab = unitPrefabs[unitIndex];
         int unitCost = unitPrefab.GetComponent<Unit>().cost;
 
-        if ((isPlayerOne && GameManager.instance.player1Gold >= unitCost) ||
-            (!isPlayerOne && GameManager.instance.player2Gold >= unitCost))
+        if ((isPlayerOne && GameManager.instance.playerGold >= unitCost) ||
+            (!isPlayerOne && GameManager.instance.aiGold >= unitCost))
         {
             if (isPlayerOne)
-                GameManager.instance.player1Gold -= unitCost;
+                GameManager.instance.playerGold -= unitCost;
             else
-                GameManager.instance.player2Gold -= unitCost;
+                GameManager.instance.aiGold -= unitCost;
 
             GameObject unit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
             unit.GetComponent<Unit>().isPlayerOne = isPlayerOne;

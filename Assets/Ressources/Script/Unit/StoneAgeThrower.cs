@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StoneAgeThrower : MonoBehaviour
+public class StoneAgeThrower : Unit
 {
     public GameObject stonePrefab;
     public Transform throwPoint;
@@ -18,13 +18,33 @@ public class StoneAgeThrower : MonoBehaviour
 
     private void Update()
     {
-        base.Update();
+        Move();
         // Ajoutez la logique pour lancer des pierres à distance
+    }
+
+    private void Move()
+    {
+        if (isPlayerOne)
+        {
+            transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+        }
     }
 
     private void ThrowStone()
     {
         GameObject stone = Instantiate(stonePrefab, throwPoint.position, throwPoint.rotation);
-        stone.GetComponent<Projectile>().SetDamage(damage);
+        stone.GetComponent<StoneProjectile>().SetDamage(damage);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if ((isPlayerOne && collision.CompareTag("Enemy")) || (!isPlayerOne && collision.CompareTag("PlayerOneUnit")))
+        {
+            ThrowStone();
+        }
     }
 }

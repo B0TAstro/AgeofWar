@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+    public Age[] ages;
     public GameObject[] playerUnits;
     public GameObject[] aiUnits;
     public Transform playerSpawnPoint;
@@ -21,6 +23,18 @@ public class GameManager : MonoBehaviour
 
     private float aiSpawnTimer = 0;
     private float aiSpawnInterval = 5f; // Adjust this value for AI spawn rate
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Update()
     {
@@ -41,18 +55,6 @@ public class GameManager : MonoBehaviour
         {
             SpawnAIUnit();
             aiSpawnTimer = 0;
-        }
-    }
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
         }
     }
 
