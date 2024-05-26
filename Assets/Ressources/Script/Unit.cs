@@ -4,7 +4,7 @@ public class Unit : MonoBehaviour
 {
     public UnitData unitData;
     public GameObject projectilePrefab;
-    public Transform projectileSpawnPoint; // Point de lancement des projectiles
+    public Transform projectileSpawnPoint;
 
     private int currentHealth;
     private bool isStopped = false;
@@ -30,7 +30,7 @@ public class Unit : MonoBehaviour
         if (currentTarget != null && attackTimer <= 0f)
         {
             float distanceToTarget = Vector2.Distance(transform.position, currentTarget.position);
-            if (currentTarget.GetComponent<Base>() != null) // Attaquer la base
+            if (currentTarget.GetComponent<Base>() != null)
             {
                 AttackBase(currentTarget.GetComponent<Base>());
                 attackTimer = unitData.attackInterval;
@@ -40,7 +40,7 @@ public class Unit : MonoBehaviour
                 ShootProjectile();
                 attackTimer = unitData.attackInterval;
             }
-            else if (unitData.unitName != "RangedUnit" && distanceToTarget <= 1.0f) // Ajuster la portée de mêlée si nécessaire
+            else if (unitData.unitName != "RangedUnit" && distanceToTarget <= 1.0f)
             {
                 MeleeAttack(currentTarget.GetComponent<Unit>());
                 attackTimer = unitData.attackInterval;
@@ -51,21 +51,18 @@ public class Unit : MonoBehaviour
     private void InitializeUnit()
     {
         currentHealth = unitData.health;
-        gameManager = FindObjectOfType<GameManager>(); // Trouver le GameManager
+        gameManager = FindObjectOfType<GameManager>();
 
-        // Ajout du BoxCollider2D pour la gestion de la file d'attente
         BoxCollider2D queueCollider = gameObject.AddComponent<BoxCollider2D>();
         queueCollider.isTrigger = true;
-        queueCollider.size = new Vector2(1.0f, 1.0f); // Ajustez la taille selon vos besoins
+        queueCollider.size = new Vector2(1.0f, 1.0f);
 
-        // Ajout du BoxCollider2D pour détecter les collisions pour prendre des dégâts
         BoxCollider2D damageCollider = gameObject.AddComponent<BoxCollider2D>();
-        damageCollider.isTrigger = false; // Ce collider ne doit pas être un trigger pour les collisions physiques
-        damageCollider.offset = new Vector2(0, -1.0f); // Ajustez la position selon vos besoins
+        damageCollider.isTrigger = false;
+        damageCollider.offset = new Vector2(0, -1.0f);
 
         if (unitData.unitName == "RangedUnit")
         {
-            // Ajout du CircleCollider2D pour gérer la portée d'attaque
             GameObject range = new GameObject("AttackRange");
             range.transform.parent = transform;
             range.transform.localPosition = Vector2.zero;
@@ -75,10 +72,9 @@ public class Unit : MonoBehaviour
             AttackRange attackRange = range.AddComponent<AttackRange>();
             attackRange.unit = this;
 
-            // Ajout du GameObject pour le point de lancement des projectiles
             GameObject spawnPoint = new GameObject("ProjectileSpawnPoint");
             spawnPoint.transform.parent = transform;
-            spawnPoint.transform.localPosition = new Vector2(1.0f, 0); // Ajustez la position selon vos besoins
+            spawnPoint.transform.localPosition = new Vector2(1.0f, 0);
             projectileSpawnPoint = spawnPoint.transform;
         }
     }
@@ -156,7 +152,6 @@ public class Unit : MonoBehaviour
             }
             else if (otherUnit.unitData.teamId == unitData.teamId)
             {
-                // Gestion de la file d'attente des unités alliées
                 isStopped = false;
             }
         }
@@ -190,8 +185,7 @@ public class Unit : MonoBehaviour
 
     private void HandleAllyCollision(Unit ally)
     {
-        // Gestion de la file d'attente des unités alliées
-        if (ally.isStopped) // Arrêtez cette unité si l'unité alliée devant est arrêtée
+        if (ally.isStopped)
         {
             isStopped = true;
         }
@@ -239,30 +233,36 @@ public class Unit : MonoBehaviour
         {
             Debug.Log($"{unitData.unitName} attacks {enemy.unitData.unitName} for {unitData.attackPower} damage.");
             enemy.TakeDamage(unitData.attackPower);
-        }
-    }
 
-    private void AttackBase(Base enemyBase)
-    {
-        if (enemyBase != null)
-        {
-            Debug.Log($"{unitData.unitName} attacks base {enemyBase.teamId} for {unitData.attackPower} damage.");
-            enemyBase.TakeDamage(unitData.attackPower);
+            if (enemy.GetHealth() <= 0)
+            {
+                gameManager.AddGold(unitData.goldReward);
+                gameManager.AddXP(unitData.xpReward);
+                Debug.Log($"{unitData.unitName} killed {enemy.unitData.unitName} and gained {unitData.goldReward} gold and {unitData.xpReward} XP.");
+            }
         }
     }
 
     private void ShootProjectile()
     {
-        if (projectilePrefab != null && currentTarget != null && projectileSpawnPoint != null)
+        if (projectilePrefab != null && projectileSpawnPoint != null)
         {
-            GameObject projectile = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.identity);
-            Projectile projScript = projectile.GetComponent<Projectile>();
-            projScript.damage = unitData.attackPower;
-            projScript.speed = 5.0f; // Vitesse du projectile
-            projScript.teamId = unitData.teamId;
-            projScript.target = currentTarget; // Assigner la cible pour le projectile
-            Debug.Log($"{unitData.unitName} shoots a projectile.");
+            GameObject projectileObject = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.identity);
+            Projectile projectile = projectileObject.GetComponent<Projectile>();
+            if (projectile != null)
+            {
+                projectile.damage = unitData.attackPower;
+                projectile.speed = 10f;
+                projectile.teamId = unitData.teamId;
+                projectile.target = currentTarget;
+            }
         }
+    }
+
+    private void AttackBase(Base enemyBase)
+    {
+        Debug.Log($"{unitData.unitName} attacks {enemyBase.name} for {unitData.attackPower} damage.");
+        enemyBase.TakeDamage(unitData.attackPower);
     }
 
     public void TakeDamage(int damage)
@@ -271,13 +271,13 @@ public class Unit : MonoBehaviour
         Debug.Log($"{unitData.unitName} takes {damage} damage. Remaining health: {currentHealth}.");
         if (currentHealth <= 0)
         {
-            if (gameManager != null && unitData.teamId != 1) // Vérifiez que l'unité n'appartient pas à l'équipe du joueur (équipe 1)
-            {
-                gameManager.AddGold(unitData.goldReward); // Ajout de la récompense d'or
-                gameManager.AddXP(unitData.xpReward); // Ajout de l'XP
-            }
             Debug.Log($"{unitData.unitName} has been destroyed.");
             Destroy(gameObject);
         }
+    }
+
+    public int GetHealth()
+    {
+        return currentHealth;
     }
 }
