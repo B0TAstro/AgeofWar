@@ -1,91 +1,93 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
-    public Age[] ages;
-    public GameObject[] playerUnits;
-    public GameObject[] aiUnits;
-    public Transform playerSpawnPoint;
-    public Transform aiSpawnPoint;
+    public int playerGold = 100; // Or initial pour le joueur
+    public int playerXP = 0; // XP initial pour le joueur
+    public int playerAge = 1; // Age initial du joueur
+    public int[] xpThresholds; // Seuils d'XP pour chaque âge
+    public Text playerGoldText; // Référence au texte UI pour afficher l'or
+    public Text playerXPText; // Référence au texte UI pour afficher l'XP
+    public Text playerAgeText; // Référence au texte UI pour afficher l'âge
+    public Text gameOverText; // Référence au texte UI pour afficher le message de fin de partie
 
-    public int playerGold = 100;
-    public int aiGold = 100;
-    public int playerExperience = 0;
-    public int aiExperience = 0;
-    public int experienceToNextAge = 100;
-
-    private int playerAge = 0;
-    private int aiAge = 0;
-
-    private float aiSpawnTimer = 0;
-    private float aiSpawnInterval = 5f; // Adjust this value for AI spawn rate
-
-    private void Awake()
+    void Start()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        UpdateGoldText();
+        UpdateXPText();
+        UpdateAgeText();
+        gameOverText.gameObject.SetActive(false); // Masquer le message de fin de partie au début
     }
 
-    private void Update()
+    public void AddGold(int amount)
     {
-        if (playerExperience >= experienceToNextAge)
+        playerGold += amount;
+        UpdateGoldText();
+        Debug.Log($"Player gold: {playerGold}");
+    }
+
+    public bool SpendGold(int amount)
+    {
+        if (playerGold >= amount)
         {
-            playerExperience -= experienceToNextAge;
+            playerGold -= amount;
+            UpdateGoldText();
+            Debug.Log($"Player spent {amount} gold. Remaining: {playerGold}");
+            return true;
+        }
+        Debug.Log("Not enough gold to spend.");
+        return false;
+    }
+
+    public void AddXP(int amount)
+    {
+        playerXP += amount;
+        UpdateXPText();
+        Debug.Log($"Player XP: {playerXP}");
+        CheckForAgeUp();
+    }
+
+    private void CheckForAgeUp()
+    {
+        if (playerAge < xpThresholds.Length && playerXP >= xpThresholds[playerAge])
+        {
             playerAge++;
-        }
-
-        if (aiExperience >= experienceToNextAge)
-        {
-            aiExperience -= experienceToNextAge;
-            aiAge++;
-        }
-
-        aiSpawnTimer += Time.deltaTime;
-        if (aiSpawnTimer >= aiSpawnInterval)
-        {
-            SpawnAIUnit();
-            aiSpawnTimer = 0;
+            UpdateAgeText();
+            Debug.Log($"Player has aged up to Age {playerAge}");
+            // Logique pour débloquer de nouvelles unités ici
         }
     }
 
-    public void SpawnPlayerUnit(int unitIndex)
+    private void UpdateGoldText()
     {
-        if (unitIndex < playerUnits.Length && playerGold >= playerUnits[unitIndex].GetComponent<Unit>().cost)
+        if (playerGoldText != null)
         {
-            Instantiate(playerUnits[unitIndex], playerSpawnPoint.position, Quaternion.identity);
-            playerGold -= playerUnits[unitIndex].GetComponent<Unit>().cost;
+            playerGoldText.text = $"Gold: {playerGold}";
         }
     }
 
-    private void SpawnAIUnit()
+    private void UpdateXPText()
     {
-        int unitIndex = Random.Range(0, aiUnits.Length);
-        if (aiGold >= aiUnits[unitIndex].GetComponent<Unit>().cost)
+        if (playerXPText != null)
         {
-            Instantiate(aiUnits[unitIndex], aiSpawnPoint.position, Quaternion.identity);
-            aiGold -= aiUnits[unitIndex].GetComponent<Unit>().cost;
+            playerXPText.text = $"XP: {playerXP}";
         }
     }
 
-    public void RewardPlayer(int gold, int experience)
+    private void UpdateAgeText()
     {
-        playerGold += gold;
-        playerExperience += experience;
+        if (playerAgeText != null)
+        {
+            playerAgeText.text = $"Age: {playerAge}";
+        }
     }
 
-    public void RewardAI(int gold, int experience)
+    public void EndGame(int losingTeamId)
     {
-        aiGold += gold;
-        aiExperience += experience;
+        string result = losingTeamId == 1 ? "You Lose!" : "You Win!";
+        gameOverText.text = result;
+        gameOverText.gameObject.SetActive(true);
+        Time.timeScale = 0; // Arrêter le temps
     }
 }

@@ -1,28 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Spawner : MonoBehaviour
 {
-    public GameObject[] unitPrefabs;
+    public GameManager gameManager;
+    public GameObject unitPrefab;
+    public UnitData unitData;
     public Transform spawnPoint;
-    public bool isPlayerOne;
+    public Button spawnButton;
 
-    public void SpawnUnit(int unitIndex)
+    void Start()
     {
-        GameObject unitPrefab = unitPrefabs[unitIndex];
-        int unitCost = unitPrefab.GetComponent<Unit>().cost;
+        spawnButton.onClick.AddListener(SpawnUnit);
+    }
 
-        if ((isPlayerOne && GameManager.instance.playerGold >= unitCost) ||
-            (!isPlayerOne && GameManager.instance.aiGold >= unitCost))
+    void SpawnUnit()
+    {
+        if (gameManager.SpendGold(unitData.cost))
         {
-            if (isPlayerOne)
-                GameManager.instance.playerGold -= unitCost;
-            else
-                GameManager.instance.aiGold -= unitCost;
-
-            GameObject unit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
-            unit.GetComponent<Unit>().isPlayerOne = isPlayerOne;
+            GameObject newUnit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
+            Unit unitScript = newUnit.GetComponent<Unit>();
+            unitScript.unitData = unitData;
+            Debug.Log($"Spawned {unitData.unitName}");
+        }
+        else
+        {
+            Debug.Log("Not enough gold to spawn unit.");
         }
     }
 }
