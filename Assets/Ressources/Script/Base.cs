@@ -2,27 +2,33 @@ using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-    public int maxHealth;
-    public int currentHealth;
+    public int teamId;
+    private int health;
+    private int maxHealth; // Added maxHealth variable
 
     void Start()
     {
-        currentHealth = maxHealth;
+        health = 100;
+        maxHealth = 100; // Initialize maxHealth
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        if (currentHealth <= 0)
+        health -= damage;
+        if (health <= 0)
         {
-            currentHealth = 0;
-            // Handle base destruction or game over logic here
+            // Logic for game over or base destruction
         }
+    }
+
+    public int GetHealth()
+    {
+        return health;
     }
 
     public void IncreaseMaxHealth(int amount)
     {
         maxHealth += amount;
-        currentHealth += amount; // Optionally heal the base by the same amount
+        health += amount; // Also increase current health
     }
 }

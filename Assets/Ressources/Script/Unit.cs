@@ -236,13 +236,12 @@ public class Unit : MonoBehaviour
 
             if (enemy.GetHealth() <= 0)
             {
-                gameManager.AddGold(unitData.goldReward);
-                gameManager.AddXP(unitData.xpReward);
+                gameManager.AddGold(unitData.teamId, unitData.goldReward);
+                gameManager.AddXP(unitData.teamId, unitData.xpReward);
                 Debug.Log($"{unitData.unitName} killed {enemy.unitData.unitName} and gained {unitData.goldReward} gold and {unitData.xpReward} XP.");
             }
         }
     }
-
     private void ShootProjectile()
     {
         if (projectilePrefab != null && projectileSpawnPoint != null)

@@ -3,97 +3,82 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public int playerGold = 100;
-    public int playerXP = 0;
-    public int playerAge = 1;
-    public int[] xpThresholds = { 100, 300, 600 };
+    public PlayerData[] players;
     public AgeData[] agesData;
-    public Text playerGoldText;
-    public Text playerXPText;
-    public Text playerAgeText;
-    public Text gameOverText;
 
-    public Base playerBase; // Référence à la base du joueur
+    public Text gameOverText;
 
     void Start()
     {
-        UpdateGoldText();
-        UpdateXPText();
-        UpdateAgeText();
+        foreach (var player in players)
+        {
+            player.UpdateGoldText();
+            player.UpdateXPText();
+            player.UpdateAgeText();
+        }
         gameOverText.gameObject.SetActive(false);
     }
 
-    public void AddGold(int amount)
+    public void AddGold(int playerId, int amount)
     {
-        playerGold += amount;
-        UpdateGoldText();
-        Debug.Log($"Player gold: {playerGold}");
+        players[playerId].playerGold += amount;
+        players[playerId].UpdateGoldText();
     }
 
-    public bool SpendGold(int amount)
+    public void AddXP(int playerId, int amount)
     {
-        if (playerGold >= amount)
+        players[playerId].playerXP += amount;
+        players[playerId].UpdateXPText();
+        CheckForAgeUp(playerId);
+    }
+
+    private void CheckForAgeUp(int playerId)
+    {
+        var player = players[playerId];
+        if (player.playerAge < agesData.Length && player.playerXP >= agesData[player.playerAge].baseHealthIncrease)
         {
-            playerGold -= amount;
-            UpdateGoldText();
-            Debug.Log($"Player spent {amount} gold. Remaining: {playerGold}");
+            player.playerAge++;
+            player.UpdateAgeText();
+            AgeUp(playerId, player.playerAge);
+        }
+    }
+
+    private void AgeUp(int playerId, int ageIndex)
+    {
+        players[playerId].playerBase.IncreaseMaxHealth(agesData[ageIndex].baseHealthIncrease);
+    }
+
+    public void SpawnUnit(int playerId, UnitData unitData, Vector2 position)
+    {
+        var player = players[playerId];
+        if (player.playerGold >= unitData.cost)
+        {
+            player.playerGold -= unitData.cost;
+            player.UpdateGoldText();
+
+            GameObject unitPrefab = Instantiate(Resources.Load<GameObject>(unitData.unitName), position, Quaternion.identity);
+            Unit unit = unitPrefab.GetComponent<Unit>();
+            unit.unitData = unitData;
+        }
+        else
+        {
+            Debug.Log("Not enough gold to spawn unit.");
+        }
+    }
+
+    public bool SpendGold(int playerId, int amount)
+    {
+        var player = players[playerId];
+        if (player.playerGold >= amount)
+        {
+            player.playerGold -= amount;
+            player.UpdateGoldText();
             return true;
         }
-        Debug.Log("Not enough gold to spend.");
-        return false;
-    }
-
-    public void AddXP(int amount)
-    {
-        playerXP += amount;
-        UpdateXPText();
-        Debug.Log($"Player XP: {playerXP}");
-        CheckForAgeUp();
-    }
-
-    private void CheckForAgeUp()
-    {
-        if (playerAge < xpThresholds.Length && playerXP >= xpThresholds[playerAge])
+        else
         {
-            playerAge++;
-            UpdateAgeText();
-            Debug.Log($"Player has aged up to Age {playerAge}");
-            AgeUp(playerAge - 1); // L'index des âges commence à 0
-        }
-    }
-
-    private void AgeUp(int ageIndex)
-    {
-        // Mise à jour de la base
-        playerBase.IncreaseMaxHealth(agesData[ageIndex].baseHealthIncrease);
-        
-        // Débloquer de nouvelles unités ici
-        // Par exemple, mettre à jour les boutons de spawn pour utiliser les nouvelles unités
-
-        // Mettez à jour l'interface utilisateur ou d'autres éléments ici
-    }
-
-    private void UpdateGoldText()
-    {
-        if (playerGoldText != null)
-        {
-            playerGoldText.text = $"Gold: {playerGold}";
-        }
-    }
-
-    private void UpdateXPText()
-    {
-        if (playerXPText != null)
-        {
-            playerXPText.text = $"XP: {playerXP}";
-        }
-    }
-
-    private void UpdateAgeText()
-    {
-        if (playerAgeText != null)
-        {
-            playerAgeText.text = $"Age: {playerAge}";
+            Debug.Log("Not enough gold to spend.");
+            return false;
         }
     }
 
@@ -102,6 +87,6 @@ public class GameManager : MonoBehaviour
         string result = losingTeamId == 1 ? "You Lose!" : "You Win!";
         gameOverText.text = result;
         gameOverText.gameObject.SetActive(true);
-        Time.timeScale = 0; // Arrêter le temps
+        Time.timeScale = 0;
     }
 }
