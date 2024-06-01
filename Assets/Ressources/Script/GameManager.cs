@@ -3,21 +3,24 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public int playerGold = 100; // Or initial pour le joueur
-    public int playerXP = 0; // XP initial pour le joueur
-    public int playerAge = 1; // Age initial du joueur
-    public int[] xpThresholds; // Seuils d'XP pour chaque âge
-    public Text playerGoldText; // Référence au texte UI pour afficher l'or
-    public Text playerXPText; // Référence au texte UI pour afficher l'XP
-    public Text playerAgeText; // Référence au texte UI pour afficher l'âge
-    public Text gameOverText; // Référence au texte UI pour afficher le message de fin de partie
+    public int playerGold = 100;
+    public int playerXP = 0;
+    public int playerAge = 1;
+    public int[] xpThresholds = { 100, 300, 600 };
+    public AgeData[] agesData;
+    public Text playerGoldText;
+    public Text playerXPText;
+    public Text playerAgeText;
+    public Text gameOverText;
+
+    public Base playerBase; // Référence à la base du joueur
 
     void Start()
     {
         UpdateGoldText();
         UpdateXPText();
         UpdateAgeText();
-        gameOverText.gameObject.SetActive(false); // Masquer le message de fin de partie au début
+        gameOverText.gameObject.SetActive(false);
     }
 
     public void AddGold(int amount)
@@ -55,8 +58,19 @@ public class GameManager : MonoBehaviour
             playerAge++;
             UpdateAgeText();
             Debug.Log($"Player has aged up to Age {playerAge}");
-            // Logique pour débloquer de nouvelles unités ici
+            AgeUp(playerAge - 1); // L'index des âges commence à 0
         }
+    }
+
+    private void AgeUp(int ageIndex)
+    {
+        // Mise à jour de la base
+        playerBase.IncreaseMaxHealth(agesData[ageIndex].baseHealthIncrease);
+        
+        // Débloquer de nouvelles unités ici
+        // Par exemple, mettre à jour les boutons de spawn pour utiliser les nouvelles unités
+
+        // Mettez à jour l'interface utilisateur ou d'autres éléments ici
     }
 
     private void UpdateGoldText()
