@@ -11,6 +11,12 @@ public class GameManager : MonoBehaviour
     public Text playerXPText; // Référence au texte UI pour afficher l'XP
     public Text playerAgeText; // Référence au texte UI pour afficher l'âge
     public Text gameOverText; // Référence au texte UI pour afficher le message de fin de partie
+    public AgeData[] ages; // Unités pour chaque âge
+    public Button meleeButton;
+    public Button rangedButton;
+    public Button tankButton;
+    public Button ageUpButton; // Nouveau bouton pour monter en âge
+    private AgeData currentAgeData;
 
     void Start()
     {
@@ -18,6 +24,8 @@ public class GameManager : MonoBehaviour
         UpdateXPText();
         UpdateAgeText();
         gameOverText.gameObject.SetActive(false); // Masquer le message de fin de partie au début
+        SetAge(playerAge);
+        ageUpButton.onClick.AddListener(TryAgeUp); // Assigner la méthode de montée en âge au bouton
     }
 
     public void AddGold(int amount)
@@ -45,18 +53,7 @@ public class GameManager : MonoBehaviour
         playerXP += amount;
         UpdateXPText();
         Debug.Log($"Player XP: {playerXP}");
-        CheckForAgeUp();
-    }
-
-    private void CheckForAgeUp()
-    {
-        if (playerAge < xpThresholds.Length && playerXP >= xpThresholds[playerAge])
-        {
-            playerAge++;
-            UpdateAgeText();
-            Debug.Log($"Player has aged up to Age {playerAge}");
-            // Logique pour débloquer de nouvelles unités ici
-        }
+        UpdateAgeUpButton();
     }
 
     private void UpdateGoldText()
@@ -89,5 +86,57 @@ public class GameManager : MonoBehaviour
         gameOverText.text = result;
         gameOverText.gameObject.SetActive(true);
         Time.timeScale = 0; // Arrêter le temps
+    }
+
+    private void SetAge(int age)
+    {
+        currentAgeData = ages[age - 1];
+        UpdateUnitButtons();
+    }
+
+    private void UpdateUnitButtons()
+    {
+        meleeButton.onClick.RemoveAllListeners();
+        meleeButton.onClick.AddListener(() => SpawnUnit(currentAgeData.meleeUnitPrefab));
+
+        rangedButton.onClick.RemoveAllListeners();
+        rangedButton.onClick.AddListener(() => SpawnUnit(currentAgeData.rangedUnitPrefab));
+
+        tankButton.onClick.RemoveAllListeners();
+        tankButton.onClick.AddListener(() => SpawnUnit(currentAgeData.tankUnitPrefab));
+    }
+
+    private void SpawnUnit(GameObject unitPrefab)
+    {
+        if (SpendGold(unitPrefab.GetComponent<Unit>().unitData.cost))
+        {
+            Instantiate(unitPrefab, GetSpawnPoint(), Quaternion.identity);
+        }
+    }
+
+    private Vector2 GetSpawnPoint()
+    {
+        // Retournez ici le point de spawn souhaité pour vos unités
+        return Vector2.zero;
+    }
+
+    private void TryAgeUp()
+    {
+        if (playerAge < xpThresholds.Length && playerXP >= xpThresholds[playerAge])
+        {
+            playerAge++;
+            UpdateAgeText();
+            Debug.Log($"Player has aged up to Age {playerAge}");
+            SetAge(playerAge);
+        }
+        else
+        {
+            Debug.Log("Not enough XP to age up.");
+        }
+    }
+
+    private void UpdateAgeUpButton()
+    {
+        ageUpButton.interactable = playerAge < xpThresholds.Length && playerXP >= xpThresholds[playerAge];
     }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: MeleeAlly
   health: 100
-  attackPower: 100
+  attackPower: 20
   speed: 2
   attackInterval: 1
   attackRange: 1
