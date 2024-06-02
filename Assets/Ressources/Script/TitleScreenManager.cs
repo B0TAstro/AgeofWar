@@ -5,11 +5,13 @@ public class TitleScreenManager : MonoBehaviour
 {
     public void StartGame()
     {
-        SceneManager.LoadScene("TitleScreen");
+        Debug.Log("StartGame function called");
+        SceneManager.LoadScene("MainScene");
     }
 
     public void QuitGame()
     {
+        Debug.Log("QuitGame function called");
         Application.Quit();
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
