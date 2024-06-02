@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public Button rangedButton;
     public Button tankButton;
     public Button ageUpButton; // Nouveau bouton pour monter en âge
+    public Transform spawnPoint; // Référence au point de spawn des unités
+
     private AgeData currentAgeData;
 
     void Start()
@@ -110,14 +112,8 @@ public class GameManager : MonoBehaviour
     {
         if (SpendGold(unitPrefab.GetComponent<Unit>().unitData.cost))
         {
-            Instantiate(unitPrefab, GetSpawnPoint(), Quaternion.identity);
+            Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
         }
-    }
-
-    private Vector2 GetSpawnPoint()
-    {
-        // Retournez ici le point de spawn souhaité pour vos unités
-        return Vector2.zero;
     }
 
     private void TryAgeUp()

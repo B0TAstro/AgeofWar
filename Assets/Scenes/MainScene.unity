@@ -1443,6 +1443,7 @@ MonoBehaviour:
   rangedButton: {fileID: 1836990911}
   tankButton: {fileID: 419673372}
   ageUpButton: {fileID: 1933767640}
+  spawnPoint: {fileID: 1256101414}
 --- !u!4 &1309576290
 Transform:
   m_ObjectHideFlags: 0
