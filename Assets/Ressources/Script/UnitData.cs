@@ -10,7 +10,7 @@ public class UnitData : ScriptableObject
     public float attackInterval;
     public float attackRange;
     public int teamId;
-    public int cost;
-    public int goldReward;
-    public int xpReward;
+    public int cost; // Coût de l'unité en or
+    public int goldReward; // Or gagné en tuant une unité ennemie
+    public int xpReward; // XP gagné en tuant une unité ennemie
 }

@@ -8,7 +8,6 @@ public class Spawner : MonoBehaviour
     public UnitData unitData;
     public Transform spawnPoint;
     public Button spawnButton;
-    public int playerId;
 
     void Start()
     {
@@ -17,7 +16,7 @@ public class Spawner : MonoBehaviour
 
     void SpawnUnit()
     {
-        if (gameManager.SpendGold(playerId, unitData.cost))
+        if (gameManager.SpendGold(unitData.cost))
         {
             GameObject newUnit = Instantiate(unitPrefab, spawnPoint.position, Quaternion.identity);
             Unit unitScript = newUnit.GetComponent<Unit>();

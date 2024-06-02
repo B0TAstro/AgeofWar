@@ -12,12 +12,12 @@ public class BaseHealthDisplay : MonoBehaviour
     {
         if (playerBase != null)
         {
-            playerBaseHPText.text = "Player Base HP: " + playerBase.GetHealth().ToString();
+            playerBaseHPText.text = "Base HP: " + playerBase.GetHealth().ToString();
         }
         
         if (enemyBase != null)
         {
-            enemyBaseHPText.text = "Enemy Base HP: " + enemyBase.GetHealth().ToString();
+            enemyBaseHPText.text = "Base HP: " + enemyBase.GetHealth().ToString();
         }
     }
 }

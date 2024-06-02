@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AgeData", menuName = "ScriptableObjects/AgeData", order = 2)]
+[CreateAssetMenu(fileName = "AgeData", menuName = "ScriptableObjects/AgeData", order = 1)]
 public class AgeData : ScriptableObject
 {
-    public string ageName;
-    public int baseHealthIncrease;
-    public UnitData[] newUnits;
+    public GameObject meleeUnitPrefab;
+    public GameObject rangedUnitPrefab;
+    public GameObject tankUnitPrefab;
 }

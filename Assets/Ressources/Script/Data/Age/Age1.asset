@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b346749daaf6014d8f9cf8af8a833b5, type: 3}
+  m_Name: Age1
+  m_EditorClassIdentifier: 
+  meleeUnitPrefab: {fileID: 4195389573392256800, guid: 660c5dff415db564f9d3fd8bcdcdfa5d, type: 3}
+  rangedUnitPrefab: {fileID: 4195389573392256800, guid: ce86c785d37d6ad479ae8c76b6f82080, type: 3}
+  tankUnitPrefab: {fileID: 1531151164348647848, guid: ae9d36b1e5aea4a628838a378373c731, type: 3}
