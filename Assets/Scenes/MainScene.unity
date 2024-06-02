@@ -226,7 +226,7 @@ MonoBehaviour:
   unitPrefab: {fileID: 5873386930458156389, guid: 3af6f7985a4488047a2fd8ad038870f0, type: 3}
   unitData: {fileID: 11400000, guid: c9b467ff54334f947abf0f4da20755b9, type: 2}
   spawnPoint: {fileID: 1278024768}
-  spawnInterval: 5
+  spawnInterval: 3
 --- !u!61 &125000891
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1525,6 +1525,7 @@ MonoBehaviour:
   rangedButton: {fileID: 1836990911}
   tankButton: {fileID: 419673372}
   ageUpButton: {fileID: 1933767640}
+  spawnPoint: {fileID: 1256101414}
 --- !u!4 &1309576290
 Transform:
   m_ObjectHideFlags: 0
